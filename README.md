@@ -17,14 +17,26 @@ BoxTurtle is an automated, lane-based filament changing system, also known by so
 To accommodate any differences in rotation distance between the extruder in the tool head and the lane motors, BoxTurtle uses a toolhead buffer, such as the [Belay by Annex Engineering](https://github.com/Annex-Engineering/Belay) or the [TurtleNeck](https://github.com/ArmoredTurtle/TurtleNeck) by ArmoredTurtle. This system is "bufferless," meaning no filament boxes (no spaghetti boxes) are required, similar to the AMS. Each lane features an independent respooler equipped with a brushed motor, which helps rewind the spool and assists the lane motor in feeding the filament smoothly. This prevents issues like spool tangling or "bucking."
 
 For precise PWM control of the brushed motors, BoxTurtle relies on a custom MCU, AFC-lite, developed by [Isik's Tech @xbst](https://github.com/xbst/AFC-Lite/)  While the system currently supports BTT MMB CAN, this is a temporary solution to facilitate broader testing and will not be a permanent feature.
+# Enclosure
+
+The enclosure option for box turtle has been moved to it's [own repository](https://github.com/ArmoredTurtle/BoxTurtle-Enclosure-).
 
 # Manual (WIP)
 
+Armored Turtle's project manuals are hosted [here](https://armoredturtle.xyz). There is no PDF, this is intended to make the build experience as easy as possible.
 [Will update this as progress is made](https://armoredturtle.xyz)
+
+# Printed Parts
+
+If you purchased a kit, all of the parts you need to print are located in the [Base_Build](https://github.com/ArmoredTurtle/BoxTurtle/tree/main/STLs/Base_Build) folder under STLs on this repository. This is NOT a [VORON Design](https://vorondesign.com) project, we strongly recommend that you run a profile out specific to BoxTurtle. Voron parts profiles are not recommended. 
+
+There is a calibration print that you may like to print before getting started [here](https://www.printables.com/model/1004303-box-turtle-calibration-fidget).
 
 # Wiring
 
 ![BoxTurtle_AFC-Lite_Pinout](https://github.com/user-attachments/assets/134796f6-8458-4a61-9967-1292963d7b4b)
+
+Refer to [BT_Wiring/BoxTurtle_Wiring.xlsx](BT_Wiring/BoxTurtle_Wiring.xlsx) for recommended wire lengths for each lane.
 
 # Slicer configuration
 
@@ -34,20 +46,58 @@ For precise PWM control of the brushed motors, BoxTurtle relies on a custom MCU,
 ## Material Settings
 ![Orca_Material_Settings](https://github.com/user-attachments/assets/a1569e5a-24c5-48f9-98fb-26465bf7c75c)
 ## Ramming Settings
-![Orca_Matterial_Settings](https://github.com/user-attachments/assets/2744fb86-afae-4645-9215-3f8507558509)
+![Orca_Ramming_Settings](https://github.com/user-attachments/assets/2744fb86-afae-4645-9215-3f8507558509)
+## Add Multiple Filaments
+![Orca_Add_Filament_Settings](https://github.com/user-attachments/assets/61fb26a4-57c6-4624-8435-478d719a01ae)
 
 ## Printer Machine G-Code
 ```
 M104 S0 ; Stops OS from sending temp waits separately
 M140 S0
-PRINT_START EXTRUDER=[nozzle_temperature_initial_layer] BED=[bed_temperature_initial_layer_single] Chamber=[chamber_temperature] PRINT_MIN={first_layer_print_min[0]},{first_layer_print_min[1]} PRINT_MAX={first_layer_print_max[0]},{first_layer_print_max[1]} TOOL={initial_tool}
+PRINT_START EXTRUDER=[nozzle_temperature_initial_layer] BED=[bed_temperature_initial_layer_single] TOOL={initial_tool}
 ```
 ## Change Filament G-Code
 ```
 T[next_extruder]
 ```
+## Example PRINT_START macro
+#### *Please note this is just an example macro to show how to incorporate the initial tool into your print start macro. Please adjust it to match your printer setup.*
+```
+[gcode_macro PRINT_START]
+gcode:
+  {% set BED_TEMP = params.BED|default(60)|float %}
+  {% set EXTRUDER_TEMP = params.EXTRUDER|default(195)|float %}
+  {% set S_EXTRUDER_TEMP = 150|float %}
+  {% set initial_tool = params.TOOL|int %}
 
-## BoxTurtle sourcing/vendors
+  G90 ; use absolute coordinates
+  M83 ; extruder relative mode
+  
+  G28 # Home Printer
+  # Do any other leveling such as QGL here
+
+  AFC_PARK
+
+  M140 S{BED_TEMP} # Set bed temp
+  M109 S{EXTRUDER_TEMP} # wait for extruder temp
+  T{initial_tool} #Load Initial Tool
+  
+  M104 S{S_EXTRUDER_TEMP} # set standby extruder temp
+  M190 S{BED_TEMP} # wait for bed temp
+    
+  G28 Z
+
+  # Bedmesh or load bedmesh
+
+  AFC_PARK
+  M109 S{EXTRUDER_TEMP} ; wait for extruder temp
+  
+  # Add any pre print prime/purge line here
+  # Start Print
+```
+
+
+# BoxTurtle sourcing/vendors
 While BoxTurtle can be mostly self-sourced, some vendors offer partial or full BoxTurtle kits. These vendors also have dedicated channels on the Armored Turtle Discord.
 
 US:
@@ -69,6 +119,6 @@ UK:
 AU:
 - [DREMC](https://store.dremc.com.au/products/ldo-box-turtle-hardware-kit)
   
-## Merch
+# Merch
 - BoxTurtle T-Shirt ($3 from each sale goes to support ArmoredTurtle) via [Cotton Bureau](https://cottonbureau.com/p/QKF5XC/shirt/colored-box-turtle#/26921844/tee-men-premium-lightweight-vintage-black-tri-blend-s)- also has sweatshirt/hoodie variants
 - BoxTurtle Sticker via [Dr. Mursey](https://drmursey.myshopify.com/products/box-turtle)
