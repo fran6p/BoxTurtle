@@ -6,7 +6,12 @@ Lane 1 = leftmost filament lane\
 Lane 4  = rightmost filament lane
 
 ## AFC-Lite Wiring guide
-![BoxTurtle_AFC-Lite_Pinout](https://github.com/user-attachments/assets/134796f6-8458-4a61-9967-1292963d7b4b)
+
+Prep = Trigger Filament Sensor Switches\
+Load = Extruder Filament Sensor Switches
+
+![BoxTurtle_AFC-Lite_Pinout](https://github.com/user-attachments/assets/e5673f3d-611a-4a90-8ea7-614f6e67fffc)
+
 
 ## Extruder Steppers
 | Lane | Recommended Wire Length | Recommended Wire Gauge | Connector |
@@ -54,7 +59,7 @@ Lane 4  = rightmost filament lane
 | ----------- | --------- | ------------| --------- |
 | [D2HW-C201](D2HW-C201H.png) | 510mm | 26ga | JST-XH-3 |
 
-## TurtleNeck (optional, not required)
+## TurtleNeck (TN) sensors
 | Component | Recommended Wire Length | Recommended Wire Gauge | Connector | Notes |
 | ----------- | --------- | ------------| --------- | ---- |
 | [D2F-L w/ Lever](TN_D2L_500_X2.png)  | 500mm | 26ga | JST-XH-3 | Quantity 2 |
